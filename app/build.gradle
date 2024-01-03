@@ -64,6 +64,7 @@ dependencies {
     //极速版 (预计占用 4M 左右空间)，主要移除了一些不常用的编解码器
     implementation 'com.github.microshow:RxFFmpeg:4.9.0-lite'
 
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
     // 进度条
     implementation project(path: ':videoTimeLine')
 }

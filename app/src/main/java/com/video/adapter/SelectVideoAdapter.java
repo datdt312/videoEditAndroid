@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.video.R;
 import com.video.entity.TabButsItem;
 import com.video.entity.VideoInfo;
@@ -44,8 +45,8 @@ public class SelectVideoAdapter extends RecyclerView.Adapter<SelectVideoAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         VideoInfo item = list.get(position);
-        holder.imageView.setImageBitmap(item.getBitmap());
-
+//        holder.imageView.setImageBitmap(item.getBitmap());
+        Glide.with(holder.itemView.getContext()).load(item.getPath()).into(holder.imageView);
 
         holder.textView.setText(VideoUtils.stringForTime(item.getDurationMs()));
         holder.checkBox.setOnCheckedChangeListener((compoundButton, b) -> {

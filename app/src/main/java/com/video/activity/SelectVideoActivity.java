@@ -14,6 +14,8 @@ import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,6 +35,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 public class SelectVideoActivity extends BaseActivity {
 
@@ -72,27 +75,33 @@ public class SelectVideoActivity extends BaseActivity {
     @SuppressLint("SetTextI18n")
     private void initVideoInfo() {
         // 获取视频信息
-        List<VideoInfo> list = getVideoFromSDCard(this);
-        for (VideoInfo videoInfo : list) {
-            videoInfo.setBitmap(getVideoThumbnail(videoInfo.getPath()));
-        }
+        Executors.newCachedThreadPool().execute(() -> {
 
-        SelectVideoAdapter adapter = new SelectVideoAdapter();
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 3);
-        binding.listView.setLayoutManager(layoutManager);
+            List<VideoInfo> list = getVideoFromSDCard(this);
+//            for (VideoInfo videoInfo : list) {
+//                videoInfo.setBitmap(getVideoThumbnail(videoInfo.getPath()));
+//            }
 
-        adapter.add(list);
-        binding.listView.setAdapter(adapter);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                SelectVideoAdapter adapter = new SelectVideoAdapter();
+                RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 3);
+                binding.listView.setLayoutManager(layoutManager);
 
-        // 选择事件
-        adapter.setOnItemClickListener((position, isCheck) -> {
-            VideoInfo videoInfo = list.get(position);
-            if (isCheck) {
-                selectList.add(videoInfo.getPath());
-            } else {
-                selectList.remove(videoInfo.getPath());
-            }
-            binding.text.setText("已选择" + selectList.size() + "个");
+                adapter.add(list);
+                binding.listView.setAdapter(adapter);
+
+                // 选择事件
+                adapter.setOnItemClickListener((position, isCheck) -> {
+                    VideoInfo videoInfo = list.get(position);
+                    if (isCheck) {
+                        selectList.add(videoInfo.getPath());
+                    } else {
+                        selectList.remove(videoInfo.getPath());
+                    }
+                    binding.text.setText("已选择" + selectList.size() + "个");
+                });
+
+            });
         });
     }
 
